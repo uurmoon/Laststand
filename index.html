@@ -1,426 +1,264 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<meta name="theme-color" content="#08090d" />
-<title>Ryder: Last Stand — v0.2 Level 1 Duel</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#05060a" />
+<title>Ryder: Last Stand v0.3</title>
 <style>
-  :root{
-    --bg:#08090d; --panel:#121621; --panel2:#1a2030; --text:#eef3ff; --muted:#8c94a8;
-    --accent:#ffcf5a; --danger:#ff4e6b; --good:#5ff0a4; --line:#2a3144;
-    --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
+  :root {
+    --bg:#05060a; --panel:#0e1320; --line:#27324a; --text:#f5f7fb; --muted:#9aa4ba;
+    --gold:#f0b85a; --red:#ff506c; --blue:#5eb8ff;
   }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);}
-  body{padding:calc(8px + var(--safe-top)) 10px calc(10px + var(--safe-bottom));display:flex;align-items:center;justify-content:center;}
-  #wrap{width:min(100%,1080px);height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:10px;}
-  header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 4px 0;}
-  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
-  .badge{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#1d2c44,#11151f);border:1px solid #33415f;display:grid;place-items:center;font-weight:900;letter-spacing:-1px;box-shadow:0 8px 24px rgba(0,0,0,.25);}
-  .title{min-width:0;line-height:1.05;}
-  .title b{font-size:18px;white-space:nowrap;display:block;overflow:hidden;text-overflow:ellipsis;}
-  .title span{font-size:12px;color:var(--muted);}
-  .hudPills{display:flex;gap:8px;align-items:center;}
-  .pill{font-size:12px;font-weight:800;color:#f8fbff;border:1px solid #30384c;background:rgba(18,22,33,.78);padding:8px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);white-space:nowrap;}
-  #stageShell{width:100%;display:flex;align-items:center;justify-content:center;min-height:0;}
-  canvas{width:100%;max-height:100%;aspect-ratio:16/9;border-radius:22px;background:#151820;border:1px solid #283044;box-shadow:0 22px 70px rgba(0,0,0,.55);image-rendering:pixelated;image-rendering:crisp-edges;}
-  #controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 2px;}
-  button{border:0;color:#fff;font-weight:950;font-size:16px;letter-spacing:.4px;border-radius:22px;min-height:62px;background:linear-gradient(180deg,#1b2232,#111622);border:1px solid #31394e;box-shadow:0 10px 26px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);}
-  button:active,.pressed{transform:translateY(2px);filter:brightness(1.15);}
-  #btnPunch{background:linear-gradient(180deg,#3a3328,#211b15);border-color:#67563a;}
-  #btnKick{background:linear-gradient(180deg,#3c2630,#20141a);border-color:#694152;}
-  .smallHelp{text-align:center;color:var(--muted);font-size:12px;margin-top:-3px;}
-  @media (orientation:landscape){
-    #wrap{grid-template-rows:auto 1fr auto;max-height:100%;}
-    header{padding-top:2px}.title b{font-size:16px}.badge{width:38px;height:38px;border-radius:12px}.pill{font-size:11px;padding:7px 9px}
-    button{min-height:48px;border-radius:18px;font-size:14px}.smallHelp{display:none}
+  * { box-sizing:border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  html, body { margin:0; width:100%; min-height:100%; background:var(--bg); color:var(--text); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; overflow:hidden; }
+  body { padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:center; }
+  .shell { width:min(100%, 980px); height:100%; max-height:900px; display:flex; flex-direction:column; gap:10px; }
+  .top { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:64px; }
+  .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+  .logo { width:54px; height:54px; border:1px solid #33415f; border-radius:16px; display:flex; align-items:center; justify-content:center; background:linear-gradient(145deg,#16253d,#0d1320); box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); font-weight:900; font-size:22px; letter-spacing:-2px; }
+  .title { min-width:0; }
+  .title h1 { margin:0; font-size: clamp(21px,4.8vw,32px); line-height:1.02; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .title p { margin:3px 0 0; color:var(--muted); font-size: clamp(12px,3.4vw,16px); }
+  .stats { display:flex; gap:8px; align-items:center; }
+  .pill { padding:10px 14px; border:1px solid #303b55; border-radius:999px; background:linear-gradient(145deg,#141a2a,#0d111d); box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); font-weight:800; white-space:nowrap; }
+  .stageWrap { position:relative; flex:1; min-height:0; display:flex; align-items:center; justify-content:center; }
+  canvas { width:100%; max-width:960px; aspect-ratio:16/9; background:#0b0d14; border-radius:24px; border:1px solid #293146; box-shadow: 0 25px 90px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.035); image-rendering: pixelated; image-rendering: crisp-edges; }
+  .controls { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+  button { border:none; color:#fff; font-weight:950; font-size: clamp(18px, 4.8vw, 28px); letter-spacing:.04em; height:72px; border-radius:24px; background:linear-gradient(145deg,#151c2d,#0e1320); border:1px solid #313a52; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 8px 22px rgba(0,0,0,.32); }
+  button:active { transform: translateY(2px) scale(.99); filter:brightness(1.12); }
+  .kick { background:linear-gradient(145deg,#421d2d,#22101a); border-color:#704159; }
+  .punch { background:linear-gradient(145deg,#4a3d27,#211b12); border-color:#7b6842; }
+  .hint { text-align:center; color:#8e96aa; font-size:13px; margin-top:-4px; }
+  @media (max-height:680px) {
+    .top { min-height:50px; } .logo {width:44px;height:44px;border-radius:13px;font-size:19px} .controls button, button { height:56px; border-radius:20px; } .hint {display:none;}
   }
+  @media (orientation:landscape) { .shell {max-width:1180px} .top {min-height:48px} .controls {max-width:820px;margin:0 auto;width:100%;} button {height:58px;font-size:20px} }
 </style>
 </head>
 <body>
-<div id="wrap">
-  <header>
+<div class="shell">
+  <div class="top">
     <div class="brand">
-      <div class="badge">RX</div>
-      <div class="title"><b>Ryder: Last Stand</b><span>v0.2 Level 1 — Duel Prototype</span></div>
+      <div class="logo">RX</div>
+      <div class="title">
+        <h1>Ryder: Last Stand</h1>
+        <p>v0.3 Real Pixel Asset Build</p>
+      </div>
     </div>
-    <div class="hudPills">
+    <div class="stats">
       <div class="pill" id="levelPill">Level 1</div>
       <div class="pill" id="scorePill">Skor: 0</div>
-      <div class="pill" id="statePill">Rakip: Grim</div>
     </div>
-  </header>
-  <div id="stageShell"><canvas id="game" width="960" height="540"></canvas></div>
-  <div>
-    <div id="controls">
-      <button id="btnBack">◀ GERİ ÇEKİL</button>
-      <button id="btnPunch">YUMRUK</button>
-      <button id="btnKick">TEKME ▶</button>
-    </div>
-    <div class="smallHelp">Klavye: A geri • S korun • D yumruk • Space tekme • R yeniden başlat</div>
   </div>
+  <div class="stageWrap"><canvas id="game" width="960" height="540" aria-label="Ryder Last Stand oyunu"></canvas></div>
+  <div class="controls">
+    <button id="btnBack">◄ GERİ</button>
+    <button id="btnPunch" class="punch">YUMRUK</button>
+    <button id="btnKick" class="kick">TEKME ►</button>
+  </div>
+  <div class="hint">Klavye: A geri • S korun • D yumruk • Space tekme • R yeniden başlat</div>
 </div>
 <script>
 (() => {
   'use strict';
+  const VERSION = 'v0.3 Real Pixel Asset Build';
   const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d', { alpha:false });
+  const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
-
   const W = canvas.width, H = canvas.height;
-  const floorY = 424;
-  const levelPill = document.getElementById('levelPill');
-  const scorePill = document.getElementById('scorePill');
-  const statePill = document.getElementById('statePill');
-
-  const keys = new Set();
-  const particles = [];
-  const texts = [];
-  let last = performance.now();
-  let t = 0;
-  let hitStop = 0;
-  let screenShake = 0;
-  let score = Number(localStorage.getItem('ryderLastStandScoreV02') || 0);
-  let state = 'intro'; // intro, playing, victory, defeat
-  let introTimer = 1.4;
-
-  const player = {
-    name:'Ryder', x:335, y:floorY, vx:0, hp:100, maxHp:100, stamina:100,
-    facing:1, action:'idle', actionT:0, cdPunch:0, cdKick:0, block:false,
-    combo:0, comboT:0, hurtT:0, wins:0
+  const ASSETS = {
+    ryder: 'data:image/png;base64,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',
+    grim: 'data:image/png;base64,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',
+    fx: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAABACAYAAAD1Xam+AAACJklEQVR4nO3dza0aMRAAYBylFHpIMTmQCiIR0UGuCKRUAIcUkx5oJZqccln8wPvwrvetv++4kr3mwDAe/7DZAAAAAAAAAAAAAAAAAAAAC5VavThuh9vwWdoety3GAr361HoAQDufWw+gV3E7/B4+S9vj1xZjoV8yAOiYDIAm4nb4PnyWtsdfLcbSs2oBIHb7u6LeQz//vtxHup4VDeEFMoCKYre/m9e/KR8Ai9un61m94AOL2+HL8FnaHv/MPQ4BgKpit79L7bPyAbCobbqeTRUqEQCgstjt737d7+QD4NN26XqumiVYBYCOVcsAnhXkImJckXCz2aSU1lPku5zGt/n2o/44WvH5x7eZ4fObAlT0qDAXl1N5gbCgP6hBAKCqtwp0cTmVFQcL+qKe2Q4D9T4FiIjxGUBKq8kAImJ8AEhpNQEgIp4XBgdSSpMvC47OAHKn+Kby3nfNcaowt5e/9TtanCXI7eibu+8l7CDMretP3WeNfQNWAaBjAgB0TACAjgkA0DGrADOxCmAVYGybOVYBZADQMRuBYCJFh4IK29c+BPSfAMAkio8Fj+jDzsD6ZgsAw/n8mq8Fz17s8Y6DHbl+Puz5gDUd7HmPhX7+6gGg+FqvF64EcxUY1KEICB1TA4CJPCrcuROQVXtWsOv9WvAWX/YcAWACJYU6/wzEEvhz0EYEAJZAERA6ZgrQiF97lkAGAAAAAAAAAAAAAAAAAAAAAAAL8g8wP7/Vg6BcswAAAABJRU5ErkJggg==',
+    bg: 'data:image/png;base64,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'
   };
-  const enemy = {
-    name:'Grim', x:640, y:floorY, vx:0, hp:130, maxHp:130, stamina:100,
-    facing:-1, action:'idle', actionT:0, aiT:0, cdAttack:1.1, hurtT:0, phase:1, dead:false
-  };
+  const images = {};
+  function loadImage(key, src) { return new Promise(res => { const im = new Image(); im.onload = () => { images[key]=im; res(im); }; im.src=src; }); }
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const rand = (a,b)=>a+Math.random()*(b-a);
+  const state = { t:0, last:0, shake:0, hitStop:0, score:0, phase:'fight', message:'', messageT:0, particles:[], floaters:[], spark:null };
+  const player = { x:382, y:398, w:150, h:150, hp:100, stamina:100, frame:0, action:'idle', actionT:0, cd:0, inv:0, guard:0, facing:1 };
+  const enemy = { x:570, y:398, w:150, h:150, hp:100, frame:0, action:'idle', actionT:0, cd:1.0, dead:false, stun:0, vel:0 };
+  const groundY = 407;
 
-  function resetGame(){
-    score = 0;
-    localStorage.setItem('ryderLastStandScoreV02', score);
-    Object.assign(player,{x:335,vx:0,hp:100,stamina:100,action:'idle',actionT:0,cdPunch:0,cdKick:0,block:false,combo:0,comboT:0,hurtT:0,wins:0});
-    Object.assign(enemy,{x:640,vx:0,hp:130,stamina:100,action:'idle',actionT:0,aiT:0,cdAttack:1.1,hurtT:0,phase:1,dead:false});
-    particles.length = 0; texts.length = 0; state='intro'; introTimer=1.25; screenShake=0; hitStop=0;
+  function restart() {
+    state.t=0; state.last=0; state.shake=0; state.hitStop=0; state.score=0; state.phase='fight'; state.message=''; state.messageT=0; state.particles=[]; state.floaters=[]; state.spark=null;
+    Object.assign(player, {x:382,y:398,hp:100,stamina:100,frame:0,action:'idle',actionT:0,cd:0,inv:0,guard:0,facing:1});
+    Object.assign(enemy, {x:570,y:398,hp:100,frame:0,action:'idle',actionT:0,cd:1.0,dead:false,stun:0,vel:0});
+    updateHtml();
   }
+  function updateHtml() { document.getElementById('scorePill').textContent = 'Skor: ' + state.score; document.getElementById('levelPill').textContent = state.phase==='win' ? 'Level 1 ✓' : 'Level 1'; }
 
-  function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-  function dist(){ return Math.abs(enemy.x - player.x); }
-  function addText(txt,x,y,color='#fff',size=18){ texts.push({txt,x,y,vy:-34,life:.85,color,size}); }
-  function spark(x,y,dir,color='#ffcf5a',count=16){
-    for(let i=0;i<count;i++) particles.push({x,y,vx:(Math.random()*120+40)*dir + (Math.random()-.5)*70,vy:(Math.random()-.65)*150,life:.35+Math.random()*.3,color,s:2+Math.random()*3});
-  }
-  function dust(x,y,count=10){
-    for(let i=0;i<count;i++) particles.push({x:x+(Math.random()-.5)*36,y:y+Math.random()*8,vx:(Math.random()-.5)*65,vy:-20-Math.random()*35,life:.45,color:'rgba(190,184,172,.45)',s:2+Math.random()*5});
-  }
+  function addFloater(text,x,y,color='#fff') { state.floaters.push({text,x,y,vy:-42,a:1,color,life:.8}); }
+  function addDust(x,y,n=8) { for(let i=0;i<n;i++) state.particles.push({x:x+rand(-15,15), y:y+rand(-3,8), vx:rand(-70,70), vy:rand(-65,-10), life:rand(.25,.55), a:1, size:rand(3,9)}); }
+  function addSpark(x,y) { state.spark={x,y,t:0,frame:0,life:.22}; }
+  function startAction(who, action, dur) { who.action=action; who.actionT=dur; who.frame=0; }
+  function dist() { return Math.abs((player.x+72) - (enemy.x+72)); }
+  function canHit(range) { return state.phase==='fight' && !enemy.dead && dist() < range; }
 
-  function startPunch(){
-    if(state==='victory'){ resetGame(); return; }
-    if(state==='defeat'){ resetGame(); return; }
-    if(state!=='playing' || player.cdPunch>0 || player.stamina<10) return;
-    player.action='punch'; player.actionT=.24; player.cdPunch=.34; player.stamina-=10; player.block=false;
-    const range = 78;
-    const facingOk = player.facing === Math.sign(enemy.x-player.x) || dist()<40;
-    if(dist()<range && facingOk && !enemy.dead){
-      const dmg = 12 + Math.min(10, player.combo*2);
-      damageEnemy(dmg, 'YUMRUK');
-    } else {
-      whoosh(player.x+player.facing*42, player.y-72, player.facing);
+  function playerPunch() {
+    if(state.phase==='win') return;
+    if(player.cd>0 || player.stamina < 12) return;
+    player.stamina -= 12; player.cd=.34; startAction(player,'punch',.22);
+    if(canHit(178)) {
+      enemy.hp = clamp(enemy.hp - 12,0,100); enemy.stun=.22; enemy.vel=80; startAction(enemy,'hurt',.24);
+      state.score += 45; state.shake=5; state.hitStop=.045; addSpark(enemy.x+50, enemy.y-72); addFloater('-12', enemy.x+74, enemy.y-120, '#ffd36e'); addDust(enemy.x+55, groundY-6, 7);
+      if(enemy.hp<=0) win();
+    } else { addFloater('BOŞ', player.x+84, player.y-122, '#93a0b8'); }
+    updateHtml();
+  }
+  function playerKick() {
+    if(state.phase==='win') return;
+    if(player.cd>0 || player.stamina < 26) return;
+    player.stamina -= 26; player.cd=.56; startAction(player,'kick',.34);
+    if(canHit(205)) {
+      enemy.hp = clamp(enemy.hp - 22,0,100); enemy.stun=.38; enemy.vel=132; startAction(enemy,'hurt',.30);
+      state.score += 85; state.shake=9; state.hitStop=.07; addSpark(enemy.x+46, enemy.y-92); addFloater('-22', enemy.x+74, enemy.y-128, '#ff7d95'); addDust(enemy.x+52, groundY-4, 12);
+      if(enemy.hp<=0) win();
+    } else { addFloater('ISKA', player.x+92, player.y-120, '#93a0b8'); }
+    updateHtml();
+  }
+  function backstep() { if(state.phase==='win') return; player.x = clamp(player.x-28, 250, 420); player.guard=.24; startAction(player,'guard',.18); addDust(player.x+60, groundY-4, 5); }
+  function enemyAttack() {
+    if(enemy.dead || state.phase!=='fight') return;
+    startAction(enemy,'attack',.28); enemy.cd=rand(.85,1.2);
+    if(dist()<156 && player.inv<=0) {
+      let dmg = player.guard>0 ? 5 : 14;
+      player.hp = clamp(player.hp - dmg,0,100); player.inv=.22; state.shake = player.guard>0 ? 4 : 7; state.hitStop=.045; addSpark(player.x+100, player.y-82); addFloater('-'+dmg, player.x+78, player.y-128, player.guard>0?'#8cf0ff':'#ff637a');
+      if(!player.guard) startAction(player,'hurt',.24);
+      addDust(player.x+72, groundY-5, 8);
+      if(player.hp<=0) { state.phase='lose'; state.message='Ryder düştü'; state.messageT=9; }
     }
   }
-  function startKick(){
-    if(state==='victory'){ resetGame(); return; }
-    if(state==='defeat'){ resetGame(); return; }
-    if(state!=='playing' || player.cdKick>0 || player.stamina<22) return;
-    player.action='kick'; player.actionT=.36; player.cdKick=.58; player.stamina-=22; player.block=false;
-    const range = 104;
-    const facingOk = player.facing === Math.sign(enemy.x-player.x) || dist()<40;
-    if(dist()<range && facingOk && !enemy.dead){
-      damageEnemy(20 + Math.min(12, player.combo*2), 'TEKME');
-      enemy.vx += player.facing * 145;
-      dust(enemy.x, floorY, 8);
-    } else {
-      whoosh(player.x+player.facing*52, player.y-54, player.facing);
-    }
-  }
-  function startBack(){
-    if(state!=='playing') return;
-    player.vx = -player.facing * 210;
-    player.action='dash'; player.actionT=.22;
-    player.block=true;
-    dust(player.x, floorY, 7);
-  }
-  function startBlock(on){
-    if(state==='playing') player.block=on;
+  function win() {
+    enemy.dead=true; state.phase='win'; startAction(enemy,'fall',99); state.score += 300; state.shake=12; addDust(enemy.x+70, groundY-5, 24); addFloater('LEVEL 1 TAMAM', 455, 170, '#ffe08b'); updateHtml();
   }
 
-  function damageEnemy(dmg,label){
-    enemy.hp = clamp(enemy.hp - dmg, 0, enemy.maxHp);
-    enemy.hurtT = .22; enemy.action='hurt'; enemy.actionT=.24;
-    hitStop = .055; screenShake = 9;
-    const dir = Math.sign(enemy.x-player.x) || 1;
-    enemy.vx += dir * 110;
-    player.combo++; player.comboT=1.25;
-    score += dmg * 10 + player.combo * 15;
-    localStorage.setItem('ryderLastStandScoreV02', score);
-    addText('-'+dmg, enemy.x+dir*10, enemy.y-118, '#ffcf5a', 20);
-    if(player.combo>1) addText(player.combo+'x', player.x, player.y-142, '#7df7b2', 16);
-    spark(enemy.x-dir*20, enemy.y-82, dir, '#ffd36c', 18);
-    if(enemy.hp<=0) finishEnemy();
+  function update(dt) {
+    if(state.hitStop>0) { state.hitStop-=dt; return; }
+    state.t += dt;
+    player.cd = Math.max(0, player.cd-dt); player.inv = Math.max(0, player.inv-dt); player.guard = Math.max(0, player.guard-dt); player.stamina = clamp(player.stamina + dt*23,0,100);
+    if(player.actionT>0) { player.actionT -= dt; if(player.actionT<=0) player.action='idle'; }
+    if(enemy.actionT>0 && enemy.action!=='fall') { enemy.actionT -= dt; if(enemy.actionT<=0) enemy.action='idle'; }
+    state.shake = Math.max(0, state.shake - dt*28);
+
+    if(state.phase==='fight') {
+      // enemy keeps duel distance, not endless wave
+      if(enemy.stun>0) { enemy.stun-=dt; enemy.x += enemy.vel*dt; enemy.vel *= Math.pow(.15, dt); }
+      else {
+        enemy.cd -= dt;
+        const target = player.x + 148;
+        const gap = enemy.x - target;
+        if(gap > 20) enemy.x -= Math.min(46*dt, gap);
+        if(gap < -8) enemy.x += 35*dt;
+        if(enemy.cd<=0 && dist()<170) enemyAttack();
+      }
+      enemy.x = clamp(enemy.x, 492, 720);
+      // player lightly returns to duel zone if too far, so fight doesn't stall
+      if(player.x < 330 && player.guard<=0) player.x += 18*dt;
+    }
+    // animation frames
+    player.frame = choosePlayerFrame(); enemy.frame = chooseEnemyFrame();
+
+    // particles / floaters / spark
+    for(const p of state.particles) { p.life-=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=160*dt; p.a=clamp(p.life/.55,0,1); }
+    state.particles = state.particles.filter(p=>p.life>0);
+    for(const f of state.floaters) { f.life-=dt; f.y+=f.vy*dt; f.a=clamp(f.life/.8,0,1); }
+    state.floaters = state.floaters.filter(f=>f.life>0);
+    if(state.spark) { state.spark.t+=dt; state.spark.frame=Math.min(3, Math.floor(state.spark.t/.055)); if(state.spark.t>state.spark.life) state.spark=null; }
   }
-  function damagePlayer(dmg,label){
-    const blocked = player.block || player.action==='dash';
-    const final = blocked ? Math.ceil(dmg*.35) : dmg;
-    player.hp = clamp(player.hp - final, 0, player.maxHp);
-    player.hurtT = .25; player.action = blocked ? 'block' : 'hurt'; player.actionT=.22;
-    hitStop=.05; screenShake = blocked ? 4 : 8;
-    const dir = Math.sign(player.x-enemy.x) || -1;
-    player.vx += dir * (blocked ? 55 : 120);
-    addText(blocked ? 'BLOK -'+final : '-'+final, player.x-10, player.y-122, blocked?'#80d7ff':'#ff6380', 17);
-    spark(player.x+dir*16, player.y-78, dir, blocked?'#80d7ff':'#ff6b82', blocked?8:14);
-    player.combo=0; player.comboT=0;
-    if(player.hp<=0){ state='defeat'; statePill.textContent='Yıkıldın'; addText('RYDER DÜŞTÜ', W/2-70, 180, '#ff6380', 24); }
+  function choosePlayerFrame() {
+    if(player.action==='punch') return 3;
+    if(player.action==='kick') return 4;
+    if(player.action==='hurt') return 5;
+    if(player.action==='guard') return 2;
+    return (Math.floor(state.t*5)%2);
   }
-  function finishEnemy(){
-    enemy.dead=true; enemy.action='ko'; enemy.actionT=999;
-    score += 1500 + Math.round(player.hp)*20;
-    localStorage.setItem('ryderLastStandScoreV02', score);
-    player.wins=1;
-    state='victory'; statePill.textContent='Level 1 temiz';
-    screenShake=13; hitStop=.12;
-    addText('LEVEL 1 TEMİZLENDİ', W/2-118, 168, '#7df7b2', 25);
-    for(let i=0;i<30;i++) spark(enemy.x, enemy.y-70, Math.random()<.5?-1:1, i%2?'#7df7b2':'#ffcf5a', 1);
-  }
-  function whoosh(x,y,dir){
-    for(let i=0;i<7;i++) particles.push({x:x+i*dir*5,y:y+(Math.random()-.5)*18,vx:dir*(40+Math.random()*35),vy:(Math.random()-.5)*20,life:.18,color:'rgba(255,255,255,.42)',s:2});
+  function chooseEnemyFrame() {
+    if(enemy.action==='fall') return 4;
+    if(enemy.action==='attack') return 2;
+    if(enemy.action==='hurt') return 3;
+    return Math.floor(state.t*4)%2;
   }
 
-  function update(dt){
-    if(hitStop>0){ hitStop -= dt; return; }
-    t += dt;
-    if(state==='intro'){
-      introTimer -= dt;
-      if(introTimer<=0){ state='playing'; statePill.textContent='Rakip: Grim'; }
-    }
-    if(state==='playing'){
-      player.facing = enemy.x>=player.x ? 1 : -1;
-      enemy.facing = -player.facing;
-      player.cdPunch = Math.max(0, player.cdPunch-dt);
-      player.cdKick = Math.max(0, player.cdKick-dt);
-      player.actionT = Math.max(0, player.actionT-dt);
-      enemy.actionT = Math.max(0, enemy.actionT-dt);
-      player.hurtT = Math.max(0, player.hurtT-dt);
-      enemy.hurtT = Math.max(0, enemy.hurtT-dt);
-      player.stamina = clamp(player.stamina + dt*24, 0, 100);
-      if(player.comboT>0){ player.comboT-=dt; if(player.comboT<=0) player.combo=0; }
-      if(player.actionT<=0 && player.action!=='idle') player.action = player.block ? 'block' : 'idle';
-      if(enemy.actionT<=0 && !enemy.dead && (enemy.action==='hurt'||enemy.action==='attack')) enemy.action='idle';
-      updateAI(dt);
-    }
-    // physics even during victory for KO slide
-    player.x += player.vx*dt; enemy.x += enemy.vx*dt;
-    player.vx *= Math.pow(.08,dt); enemy.vx *= Math.pow(.06,dt);
-    player.x = clamp(player.x, 170, 520); enemy.x = clamp(enemy.x, 430, 815);
-    screenShake = Math.max(0, screenShake - dt*28);
-    updateFX(dt);
-    scorePill.textContent = 'Skor: '+Math.floor(score);
-    levelPill.textContent = 'Level 1';
-  }
-  function updateAI(dt){
-    if(enemy.dead) return;
-    enemy.cdAttack -= dt;
-    const d = dist();
-    const enraged = enemy.hp < enemy.maxHp*.45;
-    enemy.phase = enraged ? 2 : 1;
-    if(enemy.hurtT>0) return;
-    if(d>72){
-      enemy.vx += enemy.facing * (enraged?135:105) * dt;
-      enemy.action='walk';
-    } else {
-      if(enemy.cdAttack<=0){
-        enemy.action='attack'; enemy.actionT=.31;
-        enemy.cdAttack = enraged ? .74 + Math.random()*.35 : 1.05 + Math.random()*.55;
-        setTimeout(()=>{
-          if(state==='playing' && enemy.action==='attack' && dist()<92 && !enemy.dead){
-            damagePlayer(enraged?17:13,'VURDU');
-          }
-        }, 150);
-      } else if(enemy.action!=='attack') enemy.action='idle';
-    }
-  }
-  function updateFX(dt){
-    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.life-=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=180*dt; if(p.life<=0) particles.splice(i,1); }
-    for(let i=texts.length-1;i>=0;i--){ const f=texts[i]; f.life-=dt; f.x+=0; f.y+=f.vy*dt; f.vy+=24*dt; if(f.life<=0) texts.splice(i,1); }
-  }
-
-  function draw(){
-    const sx = screenShake ? (Math.random()-.5)*screenShake : 0;
-    const sy = screenShake ? (Math.random()-.5)*screenShake : 0;
-    ctx.save(); ctx.translate(sx,sy);
-    drawBackground();
-    drawHudBars();
-    drawShadow(player.x, floorY, 46, .42);
-    drawShadow(enemy.x, floorY, enemy.dead?70:48, enemy.dead?.32:.40);
-    if(player.x < enemy.x){ drawRyder(player); drawEnemy(enemy); } else { drawEnemy(enemy); drawRyder(player); }
-    drawFX();
-    drawOverlays();
+  function drawBar(x,y,w,h,val,label,mainColor) {
+    ctx.save();
+    ctx.fillStyle='rgba(8,10,15,.72)'; ctx.fillRect(x,y,w,h);
+    ctx.strokeStyle='rgba(255,255,255,.16)'; ctx.lineWidth=2; ctx.strokeRect(x,y,w,h);
+    const g=ctx.createLinearGradient(x,y,x+w,y); g.addColorStop(0, mainColor); g.addColorStop(.72,'#ffd171'); g.addColorStop(1,'#ff4f69');
+    ctx.fillStyle=g; ctx.fillRect(x+3,y+3,(w-6)*clamp(val/100,0,1),h-6);
+    ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font='12px monospace'; ctx.fillText(label, x+4, y-5);
     ctx.restore();
   }
-
-  function rect(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
-  function drawBackground(){
-    // sky/wall
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#11131b'); g.addColorStop(.44,'#272924'); g.addColorStop(.45,'#7e7b72'); g.addColorStop(.70,'#8b817c'); g.addColorStop(.71,'#2a2a2b'); g.addColorStop(1,'#15161b');
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    // wall grain deterministic
-    for(let i=0;i<520;i++){
-      const x=(i*73)%W, y=170+((i*37)%125); const a=.045+((i%7)*.01);
-      rect(x,y,2+((i*5)%8),2,'rgba(70,55,50,'+a+')');
-    }
-    // floor bands
-    rect(0, floorY-70, W, 4, 'rgba(255,255,255,.10)');
-    rect(0, floorY, W, H-floorY, '#202027');
-    rect(0, floorY+2, W, 6, 'rgba(255,255,255,.06)');
-    for(let x=-40;x<W+80;x+=70){ rect(x, floorY+52, 95, 3, 'rgba(255,255,255,.09)'); rect(x+25, floorY+96, 60, 3, 'rgba(255,255,255,.07)'); }
-    for(let x=-80;x<W+100;x+=74){
-      ctx.strokeStyle='rgba(80,95,115,.25)'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(x,floorY); ctx.lineTo(x+58,H); ctx.stroke();
-    }
-    for(let y=floorY+34;y<H;y+=38){ rect(0,y,W,2,'rgba(70,85,105,.22)'); }
-    // distant signs
-    ctx.globalAlpha=.35; rect(88,115,86,36,'#0d1018'); rect(790,98,105,40,'#0d1018'); ctx.globalAlpha=1;
-    ctx.font='bold 15px monospace'; ctx.fillStyle='rgba(255,207,90,.35)'; ctx.fillText('LEVEL 1',102,139); ctx.fillStyle='rgba(125,247,178,.30)'; ctx.fillText('DOCK',819,123);
-  }
-  function drawHudBars(){
-    drawBar(34,26,360,16,player.hp/player.maxHp,'#5ff0a4','#ff4e6b','RYDER');
-    drawBar(W-394,26,360,16,enemy.hp/enemy.maxHp,'#ffcf5a','#ff4e6b','GRIM');
-    drawBar(34,50,160,8,player.stamina/100,'#80d7ff','#3d4860','STAMINA',true);
-  }
-  function drawBar(x,y,w,h,p,c1,c2,label,small){
-    p=clamp(p,0,1); rect(x,y,w,h,'rgba(0,0,0,.45)'); rect(x+2,y+2,w-4,h-4,'#161a24');
-    const grad=ctx.createLinearGradient(x,0,x+w,0); grad.addColorStop(0,c1); grad.addColorStop(1,c2); ctx.fillStyle=grad; ctx.fillRect(x+2,y+2,(w-4)*p,h-4);
-    ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.strokeRect(x+.5,y+.5,w,h);
-    ctx.font=(small?'9':'11')+'px system-ui'; ctx.fillStyle='rgba(255,255,255,.8)'; ctx.fillText(label,x+6,y-4);
-  }
-  function drawShadow(x,y,w,a){ ctx.fillStyle='rgba(0,0,0,'+a+')'; ctx.fillRect(Math.round(x-w/2),Math.round(y-6),Math.round(w),10); }
-
-  function drawRyder(o){
-    ctx.save(); ctx.translate(o.x,o.y); ctx.scale(o.facing,1);
-    const walkBob = o.action==='walk'?Math.sin(t*14)*2:0;
-    const hurt = o.hurtT>0?Math.sin(t*80)*3:0;
-    const punch = o.action==='punch'; const kick = o.action==='kick'; const block = o.block||o.action==='block'; const dash = o.action==='dash';
-    // legs
-    rect(-11+hurt, -69+walkBob, 10, 67, '#0b1322'); rect(5+hurt, -68-walkBob, 11, 67, '#111b2d');
-    rect(-15+hurt, -5, 18, 6, '#dfe8ed'); rect(2+hurt, -4, 21, 6, '#dfe8ed');
-    // coat/cape
-    rect(-23+hurt, -130, 18, 73, '#151a22'); rect(-28+hurt, -88, 18, 36, '#11151d');
-    // torso
-    rect(-15+hurt, -127, 34, 58, '#14335d'); rect(-8+hurt, -126, 9, 58, '#2a5fa5'); rect(17+hurt, -118, 10, 38, '#101724');
-    rect(-15+hurt, -131, 38, 9, '#203d6b');
-    // head hair
-    rect(-12+hurt, -164, 28, 28, '#e6aa76'); rect(-15+hurt, -168, 31, 11, '#17233a'); rect(8+hurt, -158, 14, 6, '#10131c');
-    rect(13+hurt, -151, 5, 7, '#0a0c12');
-    // arms / poses
-    if(punch){
-      rect(15, -116, 26, 9, '#e6aa76'); rect(39,-116,18,9,'#e6aa76'); rect(56,-118,10,10,'#ffe0aa');
-      rect(-26, -117, 12, 37, '#e6aa76');
-    } else if(kick){
-      rect(4, -72, 48, 12, '#101b30'); rect(50,-66,23,7,'#dfe8ed');
-      rect(18,-113,16,9,'#e6aa76'); rect(-26,-115,12,39,'#e6aa76');
-    } else if(block){
-      rect(18,-127,13,49,'#e6aa76'); rect(22,-138,12,22,'#1b2843'); rect(-28,-119,12,38,'#e6aa76');
-    } else {
-      rect(20,-119,12,42,'#e6aa76'); rect(-26,-117,12,39,'#e6aa76');
-      rect(24,-82,15,11,'#101724');
-    }
-    if(dash){ rect(-38,-72,28,5,'rgba(128,215,255,.35)'); rect(-45,-58,20,4,'rgba(128,215,255,.25)'); }
+  function drawSprite(img, frame, x, y, w, h, flip=false) {
+    ctx.save(); ctx.imageSmoothingEnabled=false;
+    if(flip) { ctx.translate(x+w, y); ctx.scale(-1,1); ctx.drawImage(img, frame*96,0,96,96, 0,0,w,h); }
+    else ctx.drawImage(img, frame*96,0,96,96, x,y,w,h);
     ctx.restore();
   }
-
-  function drawEnemy(o){
-    ctx.save(); ctx.translate(o.x,o.y); ctx.scale(o.facing,1);
-    const hurt = o.hurtT>0?Math.sin(t*70)*4:0;
-    if(o.dead){
-      ctx.rotate(-0.18);
-      rect(-45, -35, 92, 17, '#07101b'); rect(10,-48,34,18,'#e3a173'); rect(-58,-26,45,13,'#0b1018'); rect(35,-21,38,12,'#0b1018');
-      rect(-7,-55,70,32,'#091522'); rect(22,-72,22,20,'#5a2b2f'); rect(38,-78,20,13,'#2b1719');
-      ctx.restore(); return;
-    }
-    const attacking = o.action==='attack';
-    const walkBob = o.action==='walk'?Math.sin(t*12)*2:0;
-    // legs suit
-    rect(-15+hurt, -67+walkBob, 12, 66, '#050a12'); rect(7+hurt, -67-walkBob, 12, 66, '#050a12');
-    rect(-20+hurt,-4,22,6,'#e8e8e2'); rect(4+hurt,-4,24,6,'#e8e8e2');
-    // torso suit
-    rect(-26+hurt, -132, 49, 62, '#07111d'); rect(-9+hurt,-128,12,35,'#d8e2ef'); rect(1+hurt,-128,16,52,'#0a1726');
-    // head / hair
-    rect(-14+hurt, -162, 28, 28, '#d4986c'); rect(-21+hurt, -166, 35, 14, '#351a1a'); rect(8+hurt,-154,8,6,'#120a0a');
-    // arms
-    if(attacking){
-      rect(18, -122, 28, 10, '#07111d'); rect(43,-125,18,9,'#d4986c'); rect(-31,-120,12,40,'#07111d');
-    } else if(o.action==='hurt'){
-      rect(21, -130, 12, 36, '#07111d'); rect(-40,-128,32,10,'#07111d'); rect(-45,-130,14,9,'#d4986c');
-    } else {
-      rect(22, -121, 12, 43, '#07111d'); rect(-35,-119,12,42,'#07111d');
-    }
-    if(o.phase===2){ rect(-30,-136,5,54,'rgba(255,78,107,.45)'); rect(27,-136,5,54,'rgba(255,78,107,.35)'); }
+  function draw() {
+    ctx.save();
+    ctx.clearRect(0,0,W,H);
+    const sx = state.shake>0 ? rand(-state.shake,state.shake) : 0;
+    const sy = state.shake>0 ? rand(-state.shake,state.shake) : 0;
+    ctx.translate(sx,sy);
+    ctx.imageSmoothingEnabled=false;
+    // Background: low-res scaled pixel art
+    ctx.drawImage(images.bg, 0,0,480,270, 0,0,W,H);
+    // subtle stage vignette
+    const vignette=ctx.createRadialGradient(480,260,120,480,260,620); vignette.addColorStop(0,'rgba(0,0,0,0)'); vignette.addColorStop(1,'rgba(0,0,0,.45)'); ctx.fillStyle=vignette; ctx.fillRect(0,0,W,H);
+    // HUD inside canvas
+    drawBar(42,34,330,19,player.hp,'RYDER','#66e59b');
+    ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fillRect(42,62,180,9); ctx.fillStyle='#7bc4ff'; ctx.fillRect(45,65,174*player.stamina/100,3);
+    drawBar(630,34,288,19,enemy.hp,'GRIM','#ffd066');
+    ctx.fillStyle='rgba(10,12,17,.55)'; ctx.fillRect(74,120,90,28); ctx.fillStyle='#caa560'; ctx.font='bold 18px monospace'; ctx.fillText('LEVEL 1', 88,140);
+    ctx.fillStyle='rgba(10,12,17,.55)'; ctx.fillRect(800,120,110,28); ctx.fillStyle='#75c4a4'; ctx.font='bold 15px monospace'; ctx.fillText('DUEL MODE', 812,140);
+    // character shadows
+    ctx.fillStyle='rgba(0,0,0,.28)'; ctx.fillRect(player.x+22, groundY-9, 116, 12); ctx.fillRect(enemy.x+22, groundY-9, 116, 12);
+    // draw sprites
+    drawSprite(images.ryder, player.frame, Math.round(player.x), Math.round(groundY-player.h+4), player.w, player.h, false);
+    drawSprite(images.grim, enemy.frame, Math.round(enemy.x), Math.round(groundY-enemy.h+4), enemy.w, enemy.h, false);
+    // spark
+    if(state.spark) ctx.drawImage(images.fx, state.spark.frame*64,0,64,64, state.spark.x-42, state.spark.y-42, 100,100);
+    // particles
+    for(const p of state.particles) { ctx.globalAlpha=p.a; ctx.fillStyle='rgba(191,185,172,.8)'; ctx.fillRect(Math.round(p.x),Math.round(p.y),Math.round(p.size),Math.max(2,Math.round(p.size*.35))); ctx.globalAlpha=1; }
+    // floaters
+    for(const f of state.floaters) { ctx.globalAlpha=f.a; ctx.font='bold 26px monospace'; ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillText(f.text, f.x+2, f.y+2); ctx.fillStyle=f.color; ctx.fillText(f.text, f.x, f.y); ctx.globalAlpha=1; }
+    if(state.phase==='win') overlay('LEVEL 1 TAMAMLANDI', 'Grim indirildi. Level 2 için sonraki pakete geçeceğiz.', 'R ile yeniden başlat');
+    if(state.phase==='lose') overlay('RYDER DÜŞTÜ', 'Geri çekilmeyi zamanla, tekmeyi boşa harcama.', 'R ile yeniden dene');
     ctx.restore();
   }
-
-  function drawFX(){
-    for(const p of particles){ ctx.globalAlpha=clamp(p.life*2.5,0,1); rect(p.x,p.y,p.s,p.s,p.color); }
-    ctx.globalAlpha=1;
-    for(const f of texts){ ctx.globalAlpha=clamp(f.life*1.8,0,1); ctx.font='900 '+f.size+'px system-ui'; ctx.fillStyle=f.color; ctx.fillText(f.txt,f.x,f.y); }
-    ctx.globalAlpha=1;
+  function overlay(title, sub, foot) {
+    ctx.fillStyle='rgba(3,5,10,.74)'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(240,184,90,.5)'; ctx.lineWidth=2; ctx.strokeRect(282,165,396,172);
+    ctx.fillStyle='rgba(14,17,25,.86)'; ctx.fillRect(288,171,384,160);
+    ctx.fillStyle='#ffe09a'; ctx.font='bold 36px monospace'; ctx.textAlign='center'; ctx.fillText(title,480,222);
+    ctx.fillStyle='#d5d9e3'; ctx.font='18px monospace'; ctx.fillText(sub,480,258);
+    ctx.fillStyle='#8fa0bd'; ctx.font='16px monospace'; ctx.fillText(foot,480,296);
+    ctx.textAlign='left';
   }
-  function drawOverlays(){
-    if(state==='intro'){
-      overlayPanel('LEVEL 1', 'Grim tek rakip. Onu indir, bölümü temizle.', 'YUMRUK / TEKME / GERİ ÇEKİL', '#ffcf5a');
-    }
-    if(state==='victory'){
-      overlayPanel('LEVEL 1 TAMAM', 'Rakip indirildi. Level 2 sistemi sonraki pakette açılacak.', 'Devam etmek için herhangi bir saldırı butonuna bas', '#7df7b2');
-    }
-    if(state==='defeat'){
-      overlayPanel('RYDER DÜŞTÜ', 'Grim seni paketledi kanka. Tekrar dene.', 'Yeniden başlatmak için saldırı butonuna bas veya R', '#ff6380');
-    }
+  function loop(ts) {
+    const now = ts/1000; const dt = Math.min(.033, state.last ? now-state.last : .016); state.last=now;
+    update(dt); draw(); requestAnimationFrame(loop);
   }
-  function overlayPanel(a,b,c,color){
-    ctx.fillStyle='rgba(5,7,12,.56)'; ctx.fillRect(0,0,W,H);
-    const x=180,y=120,w=600,h=160; rect(x,y,w,h,'rgba(18,22,33,.94)');
-    ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=2; ctx.strokeRect(x+.5,y+.5,w,h);
-    ctx.font='950 34px system-ui'; ctx.fillStyle=color; ctx.fillText(a,x+34,y+58);
-    ctx.font='700 18px system-ui'; ctx.fillStyle='#eef3ff'; ctx.fillText(b,x+34,y+96);
-    ctx.font='700 14px system-ui'; ctx.fillStyle='rgba(238,243,255,.65)'; ctx.fillText(c,x+34,y+130);
+  function bindHold(el, fn) {
+    const call = (e)=>{ e.preventDefault(); fn(); };
+    el.addEventListener('touchstart', call, {passive:false}); el.addEventListener('mousedown', call);
   }
-
-  function loop(now){
-    const dt = Math.min(.033,(now-last)/1000); last=now; update(dt); draw(); requestAnimationFrame(loop);
-  }
-
-  function bindButton(id, down, up){
-    const b=document.getElementById(id);
-    const onDown=e=>{e.preventDefault(); b.classList.add('pressed'); down&&down();};
-    const onUp=e=>{e.preventDefault(); b.classList.remove('pressed'); up&&up();};
-    b.addEventListener('pointerdown',onDown,{passive:false});
-    b.addEventListener('pointerup',onUp,{passive:false});
-    b.addEventListener('pointercancel',onUp,{passive:false});
-    b.addEventListener('pointerleave',onUp,{passive:false});
-  }
-  bindButton('btnPunch', startPunch);
-  bindButton('btnKick', startKick);
-  bindButton('btnBack', startBack, ()=>{player.block=false;});
-
-  window.addEventListener('keydown', e=>{
-    if(e.repeat) return;
-    if(e.code==='KeyD') startPunch();
-    if(e.code==='Space'){ e.preventDefault(); startKick(); }
-    if(e.code==='KeyA') startBack();
-    if(e.code==='KeyS') startBlock(true);
-    if(e.code==='KeyR') resetGame();
+  bindHold(document.getElementById('btnPunch'), playerPunch);
+  bindHold(document.getElementById('btnKick'), playerKick);
+  bindHold(document.getElementById('btnBack'), backstep);
+  window.addEventListener('keydown', (e)=>{
+    if(e.code==='KeyD') playerPunch();
+    if(e.code==='Space') { e.preventDefault(); playerKick(); }
+    if(e.code==='KeyA') backstep();
+    if(e.code==='KeyS') { player.guard=.35; startAction(player,'guard',.22); }
+    if(e.code==='KeyR') restart();
   });
-  window.addEventListener('keyup', e=>{ if(e.code==='KeyS') startBlock(false); if(e.code==='KeyA') player.block=false; });
-  document.addEventListener('gesturestart', e=>e.preventDefault());
-  resetGame(); requestAnimationFrame(loop);
+  Promise.all(Object.entries(ASSETS).map(([k,v])=>loadImage(k,v))).then(()=>{ restart(); requestAnimationFrame(loop); });
 })();
 </script>
 </body>
